@@ -16,7 +16,7 @@ const ProductCard = ({
     //   title, 
     //   rating, 
     //   ratingCounts,
-    //  stock,
+    //  stock,//
     // we also pass the single product component as well. which is
     product
     }) => {
