@@ -12,7 +12,7 @@ import LinkWithIcon from './LinkWithIcon'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import userContext from '../../contexts/UserContext'
 import cartContext from '../../contexts/CartContext'
-import { addToCartAPI } from './../../services/cartServices';
+// import { addToCartAPI } from './../../services/cartServices';
 import { getSuggestionsAPI } from '../../services/productservices'
 
 const Navbar = () => {
