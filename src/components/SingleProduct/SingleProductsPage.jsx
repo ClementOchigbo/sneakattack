@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { memo, useContext, useState } from 'react'
 
 import "./SingleProductsPage.css"
 
@@ -56,4 +56,4 @@ const SingleProductsPage = () => {
   )
 }
 
-export default SingleProductsPage
+export default memo(SingleProductsPage)

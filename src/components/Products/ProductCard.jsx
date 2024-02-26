@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { memo, useContext } from 'react'
 import "./ProductCard.css"
 
 import config from '../../config.json'
@@ -50,4 +50,4 @@ const ProductCard = ({
   )
 }
 
-export default ProductCard
+export default memo(ProductCard)

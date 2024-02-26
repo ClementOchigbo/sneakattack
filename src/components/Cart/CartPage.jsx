@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, memo } from 'react'
 import config from '../../config.json'
 
 import userContext from '../../contexts/UserContext'
@@ -101,4 +101,4 @@ const CartPage = () => {
   )
 }
 
-export default CartPage;
+export default memo(CartPage);
