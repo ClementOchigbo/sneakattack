@@ -12,7 +12,7 @@ import apiClient from "../utils/api-client";
 //    return apiClient.patch(`/cart/remove/${id}`)
 // }
 export function increaseProductAPI(id) {
-   return apiClient.patch(`/cart/increase/${id}`)
+   // return apiClient.patch(`/cart/increase/${id}`)
 }
 
 export function decreaseProductAPI(id) {

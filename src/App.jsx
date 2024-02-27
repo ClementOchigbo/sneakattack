@@ -9,13 +9,14 @@ import Navbar from './components/Navbar/Navbar'
 import Routing from './components/Routing/Routing'
 import { getJwt, getUser } from './services/userServices'
 import setAuthToken from './utils/setAuthToken'
-import {  decreaseProductAPI, increaseProductAPI,  } from './services/cartServices'
+// import {  decreaseProductAPI, increaseProductAPI,  } from './services/cartServices'
 import 'react-toastify/dist/ReactToastify.css'
 import cartContext from './contexts/CartContext';
 import cartReducer from './reducers/cartReducer'
 import useData from './hooks/useData'
 import useAddToCart from './hooks/cart/useAddToCart'
 import useRemoveFromCart from './hooks/cart/useRemoveFromCart';
+import useUpdateCart from './hooks/cart/useUpdateCart'
 
 setAuthToken(getJwt())
 
@@ -29,6 +30,8 @@ const App = () => {
  const addToCartMutation = useAddToCart()
  
  const removeFromCartMutation = useRemoveFromCart()
+
+ const updateCartMutation = useUpdateCart() 
 
  useEffect(() => {
   if (cartData) {
@@ -111,27 +114,34 @@ const App = () => {
       updatedCart[productIndex]
       .quantity += 1
       // setCart(updatedCart)
-      dispatchCart({type: "GET_CART", payload:{products: updatedCart} })
       
 
-      increaseProductAPI(id).catch(err => {
-        toast.error("Something went wrong!")
-        // setCart(oldCart)
-        dispatchCart({type: "REVERT_CART", payload: {cart} })
-      })
+      // increaseProductAPI(id).catch(err => {
+      //   toast.error("Something went wrong!")
+      //   // setCart(oldCart)
+       
+      // })
       
     }
     if (type === "decrease") {
       updatedCart[productIndex]
       .quantity -= 1
       // setCart(updatedCart)
-      dispatchCart({type: "GET_CART", payload:{products: updatedCart} })
+      // dispatchCart({type: "GET_CART", payload:{products: updatedCart} })
 
-      decreaseProductAPI(id).catch(err => {
-        toast.error("Something went wrong!")});
-        dispatchCart({type: "REVERT_CART", payload: {cart} })
+      // decreaseProductAPI(id).catch(err => {
+      //   toast.error("Something went wrong!")});
+      //   dispatchCart({type: "REVERT_CART", payload: {cart} })
       
     }
+    dispatchCart({type: "GET_CART", payload:{products: updatedCart} })
+
+    updateCartMutation.mutate({id, type}, {
+      onError: () => {
+        dispatchCart({type: "REVERT_CART", payload: {cart} })
+      }
+    })
+   
   }, [cart])
 
   // const getCart = useCallback(() => {
