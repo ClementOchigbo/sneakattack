@@ -9,11 +9,13 @@ import Navbar from './components/Navbar/Navbar'
 import Routing from './components/Routing/Routing'
 import { getJwt, getUser } from './services/userServices'
 import setAuthToken from './utils/setAuthToken'
-import { addToCartAPI, decreaseProductAPI, increaseProductAPI, removeFromCartAPI } from './services/cartServices'
+import {  decreaseProductAPI, increaseProductAPI,  } from './services/cartServices'
 import 'react-toastify/dist/ReactToastify.css'
 import cartContext from './contexts/CartContext';
 import cartReducer from './reducers/cartReducer'
 import useData from './hooks/useData'
+import useAddToCart from './hooks/cart/useAddToCart'
+import useRemoveFromCart from './hooks/cart/useRemoveFromCart';
 
 setAuthToken(getJwt())
 
@@ -23,6 +25,10 @@ const App = () => {
   // const [cart, setCart] = useState([]);
  const [cart, dispatchCart] = useReducer(cartReducer, [])
  const {data: cartData, refetch} = useData("/cart", null, ["cart"]);
+
+ const addToCartMutation = useAddToCart()
+ 
+ const removeFromCartMutation = useRemoveFromCart()
 
  useEffect(() => {
   if (cartData) {
@@ -51,17 +57,28 @@ const App = () => {
    
   }, [] )
 
-  const addToCart = useCallback((product, quantity) => {
-    dispatchCart({type: "ADD_TO_CART", payload: {product, quantity}});
+  const addToCart = useCallback(
+    (product, quantity) => {
+
+      dispatchCart({type: "ADD_TO_CART", payload: {product, quantity}});
+
+      addToCartMutation.mutate({id: product._id, quantity:quantity}, {
+        onError: () => {
+          toast.error("Something went wrong!!")
+          dispatchCart({type: "REVERT_CART", payload: {cart} });
     
-    addToCartAPI(product._id, quantity)
-    .then((res) => {
-      toast.success("Product Added Succesfully! ")
-    }).catch(err => {
-      toast.error("Failed to add Product!")
-      // setCart(cart)
-      dispatchCart({type: "REVERT_CART", payload: {cart} })
-    });
+        },
+      })
+    // dispatchCart({type: "ADD_TO_CART", payload: {product, quantity}});
+    
+    // addToCartAPI(product._id, quantity)
+    // .then((res) => {
+    //   toast.success("Product Added Succesfully! ")
+    // }).catch(err => {
+    //   toast.error("Failed to add Product!")
+    //   // setCart(cart)
+    //   dispatchCart({type: "REVERT_CART", payload: {cart} })
+    //});
   }, [cart])
 
   const removeFromCart =useCallback( (id) => {
@@ -70,15 +87,19 @@ const App = () => {
   //  setCart (newCart)
     dispatchCart({type: "REMOVE_FROM_CART", payload:{id} })
 
-   removeFromCartAPI(id).then(res => {
-    toast.success(res.data.message);
-  }).catch(err => {
-    toast.error("Something went wrong!");
-    // setCart(oldCart)
-    dispatchCart({type: "REVERT_CART", payload: {cart} })
-    
-    
-   });
+    removeFromCartMutation.mutate({id: product._id}, {
+      onError: () => {
+        toast.error("Something went wrong!!")
+        dispatchCart({type: "REVERT_CART", payload:{cart} });
+      },
+    })
+
+  //  removeFromCartAPI(id).then(res => {
+  //   toast.success(res.data.message);
+  // }).catch(err => {
+  //   toast.error("Something went wrong!");
+  //   // setCart(oldCart)
+  //   dispatchCart({type: "REVERT_CART", payload: {cart} })
   }, [cart])
 
   const updateCart = useCallback ((type, id) => {
