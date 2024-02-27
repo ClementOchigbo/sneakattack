@@ -20,7 +20,7 @@ const SingleProductsPage = () => {
 
     const {id} = useParams()
 
-  const{data: product, error, isLoading} =  useData(`/products/${id}`)
+  const{data: product, error, isLoading} =  useData(`/products/${id}`, null, ["products", id])
   // console.log(product);
   return (
    <section className='align_center single_product'>

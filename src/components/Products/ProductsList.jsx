@@ -6,10 +6,11 @@ import useData from '../../hooks/useData'
 import ProductCardSkeleton from './ProductCardSkeleton'
 import { useSearchParams } from 'react-router-dom'
 import Pagination from '../Common/Pagination'
+import useProductList from '../../hooks/useProductList'
 
 const ProductsList = () => {
 
- const [page, setPage] = useState(1);
+//  const [page, setPage] = useState(1);
  const [sortBy, setSortBy] = useState("");
  const [sortedProducts, setSortedProducts] = useState([]);
  const [search, setSearch] = useSearchParams();
@@ -17,18 +18,16 @@ const ProductsList = () => {
 // const page = search.get("page")
 const searchQuery = search.get("search")
 
- const {data, error, isLoading} = useData("/products", {
-  params: {
-    search: searchQuery,
-    category,
-    perPage: 10,
-    page,
-  },
- }, [searchQuery, category, page]);
+ const {data, error, isFetching, hasNextPage, fetchNextPage} = useProductList({
+  search: searchQuery,
+   category,
+   perPage: 10,
+    }); 
+  
  //console.log("Data", data)
- useEffect(() => {
-  setPage(1);
- }, [searchQuery, category]);
+//  useEffect(() => {
+//   setPage(1);
+//  }, [searchQuery, category]);
 
 const skeletons = [1,2,3,4,5,6,7,8]
 
@@ -42,10 +41,11 @@ const handlePageChange = (page) => {
   const handleScroll = () => {
     const {scrollTop, clientHeight, scrollHeight} = document.documentElement;
 
-    if (scrollTop + clientHeight >= scrollHeight - 1) {
+    if (scrollTop + clientHeight >= scrollHeight - 1 && !isFetching && hasNextPage && data) {
       console.log("Raeched to Bottom!!")
       // handlePageChange();
-      setPage(prev => prev + 1 );
+      // setPage(prev => prev + 1 );
+      fetchNextPage();
     }
    
   }
@@ -53,11 +53,11 @@ const handlePageChange = (page) => {
   window.addEventListener("scroll", handleScroll );
 
   return () =>  window.removeEventListener("scroll", handleScroll );
- },[data, isLoading]);
+ },[data, isFetching]);
 
  useEffect(() => {
-  if (data && data.products) {
-    const products = [...data.products]
+  if (data && data.pages) {
+    const products = data.pages.flatMap((page) => page.products)
 
     if (sortBy === "price desc") {
       setSortedProducts (products.sort((a, b) => b.price - a.price ))
@@ -92,7 +92,10 @@ const handlePageChange = (page) => {
 
        <div className="products_list">
         {error && <em className='form_error'>{error}</em>}
-        {data?.products && 
+        {/* {data?.pages.map((page, index) => <React.Fragment key={index}>
+        
+        </React.Fragment>)} */}
+        {
         sortedProducts.map((product) => (<ProductCard 
         key={product._id}
         //  id={product._id}
@@ -106,7 +109,7 @@ const handlePageChange = (page) => {
         product={product}
                 />))}
 
-        {isLoading
+        {isFetching
          && skeletons.map((n) => <ProductCardSkeleton key={n} />) }
                         
         </div> 
